@@ -7,6 +7,12 @@ Provides command to make outgoing calls
 
 """
 
+# TODO:
+# List online contacts
+# announce contact status change?
+# Delay before auto-answering
+# Make auto-answer optional and add answer command
+#
 
 import sys
 import gobject
@@ -39,7 +45,7 @@ class SkypeServer(object):
         print 'Call from: %s %s state: %r' % (caller_id, status, self.state)
         self.signal_call_status(caller_id, status)
                     
-        if status == 'FINISHED':
+        if status in ('FINISHED', 'CANCELLED'):
             self.state = None
             self.call = None
         elif status == 'RINGING' and not self.state:
