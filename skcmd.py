@@ -36,7 +36,7 @@ class SkypeServer(object):
     def on_call(self, call, status):
         self.call = call
         caller_id = call._GetPartnerHandle()
-        print 'Call from: %s %s' % (caller_id, status)
+        print 'Call from: %s %s state: %r' % (caller_id, status, self.state)
         self.signal_call_status(caller_id, status)
                     
         if status == 'FINISHED':
