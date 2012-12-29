@@ -16,7 +16,7 @@
 (defun skcmd-register-signal()
   (dbus-register-signal
    :session skcmd-sname skcmd-path skcmd-iname
-   "signal_call_status" 'skcmd-meta-handler ))
+   "signal_call_status" 'skcmd-status-handler ))
 
 (skcmd-register-signal)
 

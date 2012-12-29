@@ -23,6 +23,7 @@ S_NAME = "uk.co.opennet.skypecmd_service"
 class SkypeServer(object):
     def __init__(self):
         self.state = None
+        self.call = None
         self.sk = sk.Skype()
         if not self.sk.Client.IsRunning:
             self.sk.Client.Start()
@@ -33,9 +34,14 @@ class SkypeServer(object):
         print 'Attached as %s' % self.sk.CurrentUser.Handle
 
     def on_call(self, call, status):
-        print 'Call from: %s %s' % (call._GetPartnerHandle(), status)
+        self.call = call
+        caller_id = call._GetPartnerHandle()
+        print 'Call from: %s %s' % (caller_id, status)
+        self.signal_call_status(caller_id, status)
+                    
         if status == 'FINISHED':
             self.state = None
+            self.call = None
         elif status == 'RINGING' and not self.state:
             print 'answering'
             call.Answer()
@@ -46,11 +52,24 @@ class SkypeServer(object):
         self.sk.PlaceCall(contact)
         self.state = 'call placed'
 
+    def finish(self):
+        if self.call:
+            self.call.Finish()
+
     
 class SkypeObject(dbus.service.Object):
     @dbus.service.method(I_NAME, in_signature = '', out_signature = '')
-    def place_call(self, contact ):
+    def call(self, contact ):
         return self.skype.place_call(contact)
+
+    @dbus.service.method(I_NAME, in_signature = '', out_signature = '')
+    def hangup(self):
+        self.skype.finish()
+    
+    @dbus.service.signal(dbus_interface = I_NAME, signature='ss')
+    def signal_call_status(self, caller_id, status):
+        pass
+
     
     @dbus.service.method(I_NAME, in_signature = '', out_signature = '')
     def exit(self):
@@ -69,6 +88,7 @@ def main():
     s = SkypeServer()
     object = SkypeObject(session_bus, '/SkypeObject')
     object.skype = s
+    s.signal_call_status = object.signal_call_status
     
     mainloop = gobject.MainLoop()
     mainloop.run()
