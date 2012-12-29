@@ -22,6 +22,7 @@ S_NAME = "uk.co.opennet.skypecmd_service"
 
 class SkypeServer(object):
     def __init__(self):
+        self.state = None
         self.sk = sk.Skype()
         if not self.sk.Client.IsRunning:
             self.sk.Client.Start()
@@ -33,9 +34,17 @@ class SkypeServer(object):
 
     def on_call(self, call, status):
         print 'Call from: %s %s' % (call._GetPartnerHandle(), status)
+        if status == 'FINISHED':
+            self.state = None
+        elif status == 'RINGING' and not self.state:
+            print 'answering'
+            call.Answer()
+
+            
 
     def place_call(self, contact):
         self.sk.PlaceCall(contact)
+        self.state = 'call placed'
 
     
 class SkypeObject(dbus.service.Object):
