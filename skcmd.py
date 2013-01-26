@@ -11,8 +11,7 @@ Provides command to make outgoing calls
 # List online contacts
 # announce contact status change?
 # Delay before auto-answering
-# Make auto-answer optional and add answer command
-#
+# auto accept new contacts
 
 import sys
 import gobject
@@ -28,6 +27,7 @@ S_NAME = "uk.co.opennet.skypecmd_service"
 
 class SkypeServer(object):
     def __init__(self):
+	self.auto_answer = False
         self.state = None
         self.call = None
         self.sk = sk.Skype()
@@ -48,7 +48,7 @@ class SkypeServer(object):
         if status in ('FINISHED', 'CANCELLED'):
             self.state = None
             self.call = None
-        elif status == 'RINGING' and not self.state:
+        elif status == 'RINGING' and not self.state and self.auto_answer:
             print 'answering'
             call.Answer()
 
@@ -61,6 +61,16 @@ class SkypeServer(object):
     def finish(self):
         if self.call:
             self.call.Finish()
+
+    def set_auto_answer(self, on):
+	self.auto_answer = True if on in ('1', 'y', 'Y') else False
+	return str(self.auto_answer)
+
+    def answer(self):
+	if self.call and not self.state and not self.auto_answer:
+	    self.call.Answer()
+	
+	
 
     
 class SkypeObject(dbus.service.Object):
@@ -82,7 +92,15 @@ class SkypeObject(dbus.service.Object):
         print 'exit on client command'
         sys.exit(0)
         
-        
+    @dbus.service.method(I_NAME, in_signature = 's', out_signature = 's')
+    def auto_answer(self, on):
+        return self.skype .set_auto_answer(on)
+    
+    @dbus.service.method(I_NAME, in_signature = '', out_signature = '')
+    def answer(self):
+	self.skype .answer()
+
+    
 
 
 def main():
