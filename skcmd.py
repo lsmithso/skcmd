@@ -8,10 +8,13 @@ Provides command to make outgoing calls
 """
 
 # TODO:
-# List online contacts
+# List online contacts with handle, screen name, full name
+# Map full name when making call + regexp matching?
 # announce contact status change?
 # Delay before auto-answering
 # auto accept new contacts
+# Emacs lisp bindings
+#
 
 import sys
 import gobject
@@ -37,11 +40,17 @@ class SkypeServer(object):
         
         self.sk.Attach()
         self.sk.OnCallStatus  = self.on_call
-        print 'Attached as %s' % self.sk.CurrentUser.Handle
+        print 'Attached as %s - %s' % (self.sk.CurrentUser.Handle, self.sk.CurrentUser.FullName)
+	for f in self.sk.Friends:
+	    print f.Handle, f.DisplayName
+
 
     def on_call(self, call, status):
         self.call = call
         caller_id = call._GetPartnerHandle()
+	h = self.map_handle(caller_id)
+	if h:
+	    caller_id = '%s %s %s' % (caller_id, h.DisplayName, h.FullName)
         print 'Call from: %s %s state: %r' % (caller_id, status, self.state)
         self.signal_call_status(caller_id, status)
                     
@@ -70,7 +79,16 @@ class SkypeServer(object):
 	if self.call and not self.state and not self.auto_answer:
 	    self.call.Answer()
 	
+    def contacts(self):
+	return [x.Handle for x in  self.sk.Friends]
+    
+    def map_handle(self, h):
+	for f in self.sk.Friends:
+	    if h == f.Handle:
+		return f
 	
+
+    
 
     
 class SkypeObject(dbus.service.Object):
@@ -99,8 +117,10 @@ class SkypeObject(dbus.service.Object):
     @dbus.service.method(I_NAME, in_signature = '', out_signature = '')
     def answer(self):
 	self.skype .answer()
-
-    
+	
+    @dbus.service.method(I_NAME, in_signature = '', out_signature = 'as')
+    def contacts(self):
+	return self.skype .contacts()
 
 
 def main():
@@ -131,4 +151,7 @@ if __name__ == '__main__':
         main()    
     else:
         c = SkypeClient()
-        print c.command(*sys.argv[2:])
+	if sys.argv[2] != 'contacts':
+	    print c.command(*sys.argv[2:])
+	else:
+	    print '\n'.join(c.command(*sys.argv[2:]))
