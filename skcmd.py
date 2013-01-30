@@ -13,6 +13,7 @@ Provides command to make outgoing calls
 # announce contact status change?
 # Delay before auto-answering
 # auto accept new contacts
+# Add new contact
 # Emacs lisp bindings
 #
 
@@ -40,9 +41,17 @@ class SkypeServer(object):
         
         self.sk.Attach()
         self.sk.OnCallStatus  = self.on_call
+	self.sk.OnOnlineStatus = self.on_online_status
         print 'Attached as %s - %s' % (self.sk.CurrentUser.Handle, self.sk.CurrentUser.FullName)
 	for f in self.sk.Friends:
-	    print f.Handle, f.DisplayName
+	    pass
+	    # print f.Handle, f.DisplayName
+
+
+	
+    def on_online_status(self, user, status):
+	print 'User Status change: User: %s %s Status: %s' % (user.Handle, user.DisplayName, status)
+	self.signal_call_status('Skype %s %s' % (user.DisplayName, user.Handle),  status)
 
 
     def on_call(self, call, status):
