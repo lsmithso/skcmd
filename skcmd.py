@@ -41,6 +41,7 @@ class SkypeServer(object):
         print 'Attached as %s - %s' % (self.sk.CurrentUser.Handle, self.sk.CurrentUser.FullName)
 	for f in self.sk.Friends:
 	    print self.user_names(f)
+	sys.stdout.flush()
 
     def user_names(self, u):
 	return '%s/%s/%s/%s' % (u.Handle, u.DisplayName, u.FullName, u.OnlineStatus)
@@ -48,10 +49,14 @@ class SkypeServer(object):
     def on_authz(self, user):
 	print '%s-Authz request from: %s' % (timestamp(), self.user_names(user))
 	self.signal_call_status(self.user_names(user), 'authz request')
+	sys.stdout.flush()
+
 
 	
     def on_online_status(self, user, status):
 	print '%s-%s - %s' % (timestamp(), status, self.user_names(user))
+	sys.stdout.flush()
+		
 	self.signal_call_status(self.user_names(user), status)
 
 
@@ -60,6 +65,7 @@ class SkypeServer(object):
         partner_id = call._GetPartnerHandle()
 	user = self.sk.User(partner_id)
         print '%s-Call : %s %s' % (timestamp(), self.user_names(user), status)
+	sys.stdout.flush()
         self.signal_call_status(self.user_names(user), status)
         if status in ('FINISHED', 'CANCELLED'):
             self.state = None
@@ -168,3 +174,4 @@ if __name__ == '__main__':
 	    rsp =  c.command(*sys.argv[1:])
 	    if rsp:
 		print rsp
+
