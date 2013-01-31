@@ -12,7 +12,7 @@
 #Add command to set/clear this, then try with lsmithso1
 ##
 
-import sys
+import sys, datetime
 import gobject
 import dbus
 import dbus.service
@@ -23,6 +23,9 @@ import Skype4Py as sk
 I_NAME = "uk.co.opennet.skypecmd_interface"
 S_NAME = "uk.co.opennet.skypecmd_service"
 
+def timestamp():
+    n = datetime.datetime.now()
+    return n.strftime('%H:%M')
 
 class SkypeServer(object):
     def __init__(self):
@@ -49,7 +52,7 @@ class SkypeServer(object):
 	print 'XXX AUTHZ', args, kw
 	
     def on_online_status(self, user, status):
-	print '%s - %s' % (status, self.user_names(user))
+	print '%s-%s - %s' % (timestamp(), status, self.user_names(user))
 	self.signal_call_status(self.user_names(user), status)
 
 
@@ -57,7 +60,7 @@ class SkypeServer(object):
         self.call = call
         partner_id = call._GetPartnerHandle()
 	user = self.sk.User(partner_id)
-        print 'Call : %s %s' % (self.user_names(user), status)
+        print '%s-Call : %s %s' % (timestamp(), self.user_names(user), status)
         self.signal_call_status(self.user_names(user), status)
         if status in ('FINISHED', 'CANCELLED'):
             self.state = None
