@@ -46,7 +46,7 @@ class SkypeServer(object):
 	    print self.user_names(f)
 
     def user_names(self, u):
-	return '%s/%s/%s' % (u.Handle, u.DisplayName, u.FullName)
+	return '%s/%s/%s/%s' % (u.Handle, u.DisplayName, u.FullName, u.OnlineStatus)
 
     def on_authz(self, *args, **kw):
 	print 'XXX AUTHZ', args, kw
