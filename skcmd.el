@@ -11,7 +11,7 @@
   (when skcmd-announce-enabled
     (dtk-tone 1200 200 t) 
     (dtk-tone 1900 200 t)
-    (message "Skype call status: %s %s" caller_id status)))
+    (message "Skype : %s %s" caller_id status)))
 
 (defun skcmd-register-signal()
   (dbus-register-signal
@@ -19,7 +19,7 @@
    "signal_call_status" 'skcmd-status-handler ))
 
 (skcmd-register-signal)
-
+(message "skcmd registered")
 (provide 'skcmd)
 
 

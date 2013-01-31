@@ -55,14 +55,10 @@ class SkypeServer(object):
 
     def on_call(self, call, status):
         self.call = call
-        caller_id = call._GetPartnerHandle()
-	print 'xxxxx', self.sk.User(caller_id)
-	h = self.map_handle(caller_id)
-	if h:
-	    caller_id = '%s %s %s' % (caller_id, h.DisplayName, h.FullName)
-        print 'Call from: %s %s state: %r' % (caller_id, status, self.state)
-        self.signal_call_status(caller_id, status)
-                    
+        partner_id = call._GetPartnerHandle()
+	user = self.sk.User(partner_id)
+        print 'Call : %s %s' % (self.user_names(user), status)
+        self.signal_call_status(self.user_names(user), status)
         if status in ('FINISHED', 'CANCELLED'):
             self.state = None
             self.call = None
@@ -70,7 +66,6 @@ class SkypeServer(object):
             print 'answering'
             call.Answer()
 
-            
 
     def place_call(self, contact):
         self.sk.PlaceCall(contact)
