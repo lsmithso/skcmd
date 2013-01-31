@@ -6,11 +6,8 @@
 # auto accept new contacts
 # Add new contact
 # Emacs lisp bindings#
-#    def _SetIsAuthorized(self, Value):
+# XXX AUTHZ (<Skype4Py.user.User with Handle='joetest13'>,) {}
 #
-#
-#Add command to set/clear this, then try with lsmithso1
-##
 
 import sys, datetime
 import gobject
@@ -48,8 +45,10 @@ class SkypeServer(object):
     def user_names(self, u):
 	return '%s/%s/%s/%s' % (u.Handle, u.DisplayName, u.FullName, u.OnlineStatus)
 
-    def on_authz(self, *args, **kw):
-	print 'XXX AUTHZ', args, kw
+    def on_authz(self, user):
+	print '%s-Authz request from: %s' % (timestamp(), self.user_names(user))
+	self.signal_call_status(self.user_names(user), 'authz request')
+
 	
     def on_online_status(self, user, status):
 	print '%s-%s - %s' % (timestamp(), status, self.user_names(user))
@@ -89,12 +88,9 @@ class SkypeServer(object):
     def contacts(self):
 	return [self.user_names(x) for x in  self.sk.Friends]
     
-    def map_handle(self, h):
-	for f in self.sk.Friends:
-	    if h == f.Handle:
-		return f
-	
-
+    def authz(self, name, status):
+	user = self.sk.User(name)
+	user.IsAuthorized = True if status == '1' else False
     
 
     
@@ -129,6 +125,9 @@ class SkypeObject(dbus.service.Object):
     def contacts(self):
 	return self.skype .contacts()
 
+    @dbus.service.method(I_NAME, in_signature = 'ss', out_signature = '')
+    def authz(self, user, status):
+	self.skype.authz(user, status)
 
 def main():
     main_loop = dbus.mainloop.glib.DBusGMainLoop(set_as_default = True)
