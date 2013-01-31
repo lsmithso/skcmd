@@ -1,21 +1,16 @@
 #!/usr/bin/env python
 
-"""
-A dbus server that proxies  
-Auto-connects incoming calls
-Provides command to make outgoing calls
-
-"""
 
 # TODO:
-# List online contacts with handle, screen name, full name
-# Map full name when making call + regexp matching?
-# announce contact status change?
 # Delay before auto-answering
 # auto accept new contacts
 # Add new contact
-# Emacs lisp bindings
+# Emacs lisp bindings#
+#    def _SetIsAuthorized(self, Value):
 #
+#
+#Add command to set/clear this, then try with lsmithso1
+##
 
 import sys
 import gobject
@@ -42,21 +37,26 @@ class SkypeServer(object):
         self.sk.Attach()
         self.sk.OnCallStatus  = self.on_call
 	self.sk.OnOnlineStatus = self.on_online_status
+	self.sk.OnUserAuthorizationRequestReceived = self.on_authz
         print 'Attached as %s - %s' % (self.sk.CurrentUser.Handle, self.sk.CurrentUser.FullName)
 	for f in self.sk.Friends:
-	    pass
-	    # print f.Handle, f.DisplayName
+	    print self.user_names(f)
 
+    def user_names(self, u):
+	return '%s/%s/%s' % (u.Handle, u.DisplayName, u.FullName)
 
+    def on_authz(self, *args, **kw):
+	print 'XXX AUTHZ', args, kw
 	
     def on_online_status(self, user, status):
-	print 'User Status change: User: %s %s Status: %s' % (user.Handle, user.DisplayName, status)
-	self.signal_call_status('Skype %s %s' % (user.DisplayName, user.Handle),  status)
+	print '%s - %s' % (status, self.user_names(user))
+	self.signal_call_status(self.user_names(user), status)
 
 
     def on_call(self, call, status):
         self.call = call
         caller_id = call._GetPartnerHandle()
+	print 'xxxxx', self.sk.User(caller_id)
 	h = self.map_handle(caller_id)
 	if h:
 	    caller_id = '%s %s %s' % (caller_id, h.DisplayName, h.FullName)
@@ -89,7 +89,7 @@ class SkypeServer(object):
 	    self.call.Answer()
 	
     def contacts(self):
-	return [x.Handle for x in  self.sk.Friends]
+	return [self.user_names(x) for x in  self.sk.Friends]
     
     def map_handle(self, h):
 	for f in self.sk.Friends:
