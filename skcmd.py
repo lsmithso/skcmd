@@ -149,13 +149,20 @@ class SkypeClient(object):
 
     def command(self, cmd, *args):
         return getattr(self.remote_object, cmd)(*args)
+
+    def command_list(self):
+	return [x  for x in SkypeObject.__dict__ if x[0] != '_']
     
 if __name__ == '__main__':
     if sys.argv[1] == 's':
         main()    
     else:
         c = SkypeClient()
-	if sys.argv[2] != 'contacts':
-	    print c.command(*sys.argv[2:])
+	if sys.argv[1] == 'contacts':
+	    print '\n'.join(c.command(*sys.argv[1:]))
+	elif sys.argv[1] =='help':
+	    print '\n'.join(c.command_list())
 	else:
-	    print '\n'.join(c.command(*sys.argv[2:]))
+	    rsp =  c.command(*sys.argv[1:])
+	    if rsp:
+		print rsp
