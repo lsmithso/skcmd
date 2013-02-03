@@ -6,7 +6,7 @@
 # auto accept new contacts
 # Add new contact
 # Emacs lisp bindings#
-# XXX AUTHZ (<Skype4Py.user.User with Handle='joetest13'>,) {}
+#chat - announce new chat req. chat command blocks while chatting?
 #
 
 import sys, datetime
