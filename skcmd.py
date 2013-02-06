@@ -6,8 +6,7 @@
 # auto accept new contacts
 # Add new contact
 # Emacs lisp bindings#
-#chat - announce new chat req. chat command blocks while chatting?
-#
+
 
 import sys, datetime
 import gobject
@@ -38,6 +37,7 @@ class SkypeServer(object):
         self.sk.OnCallStatus  = self.on_call
 	self.sk.OnOnlineStatus = self.on_online_status
 	self.sk.OnUserAuthorizationRequestReceived = self.on_authz
+	self.sk.OnMessageStatus = self.on_message
         print 'Attached as %s - %s. Balance: %s' % (self.sk.CurrentUser.Handle, self.sk.CurrentUser.FullName, self.sk.CurrentUserProfile.BalanceToText)
 	for f in self.sk.Friends:
 	    print self.user_names(f)
@@ -45,6 +45,18 @@ class SkypeServer(object):
 
     def user_names(self, u):
 	return '%s/%s/%s/%s' % (u.Handle, u.DisplayName, u.FullName, u.OnlineStatus)
+
+    def on_message(self, chat, status):
+	if status in ('RECEIVED','SENDING'):
+	    print timestamp(), status, chat.FromHandle, chat.Body
+	    sys.stdout.flush()
+	if  status == 'RECEIVED':
+	    	self.signal_call_status(chat.FromHandle, chat.Body)
+		
+	    	chat.MarkAsSeen()
+
+	
+	
 
     def on_authz(self, user):
 	print '%s-Authz request from: %s' % (timestamp(), self.user_names(user))
@@ -97,6 +109,10 @@ class SkypeServer(object):
     def authz(self, name, status):
 	user = self.sk.User(name)
 	user.IsAuthorized = True if status == '1' else False
+
+    def chat(self, user, msg):
+	c = self.sk.CreateChatWith(user)
+	c.SendMessage(msg)
     
 
     
@@ -134,6 +150,10 @@ class SkypeObject(dbus.service.Object):
     @dbus.service.method(I_NAME, in_signature = 'ss', out_signature = '')
     def authz(self, user, status):
 	self.skype.authz(user, status)
+
+    @dbus.service.method(I_NAME, in_signature = 'ss', out_signature = '')
+    def chat(self, user, msg):
+	self.skype.chat(user, msg)
 
 def main():
     main_loop = dbus.mainloop.glib.DBusGMainLoop(set_as_default = True)
