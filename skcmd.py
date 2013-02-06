@@ -38,7 +38,7 @@ class SkypeServer(object):
         self.sk.OnCallStatus  = self.on_call
 	self.sk.OnOnlineStatus = self.on_online_status
 	self.sk.OnUserAuthorizationRequestReceived = self.on_authz
-        print 'Attached as %s - %s' % (self.sk.CurrentUser.Handle, self.sk.CurrentUser.FullName)
+        print 'Attached as %s - %s. Balance: %s' % (self.sk.CurrentUser.Handle, self.sk.CurrentUser.FullName, self.sk.CurrentUserProfile.BalanceToText)
 	for f in self.sk.Friends:
 	    print self.user_names(f)
 	sys.stdout.flush()
