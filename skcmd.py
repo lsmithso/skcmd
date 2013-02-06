@@ -188,6 +188,8 @@ if __name__ == '__main__':
         c = SkypeClient()
 	if sys.argv[1] == 'contacts':
 	    print '\n'.join(c.command(*sys.argv[1:]))
+	elif sys.argv[1] == 'chat':
+	    c.command(sys.argv[1], sys.argv[2], ' '.join(sys.argv[3:]))
 	elif sys.argv[1] =='help':
 	    print '\n'.join(c.command_list())
 	else:
