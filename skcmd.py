@@ -38,6 +38,8 @@ class SkypeServer(object):
 	self.sk.OnOnlineStatus = self.on_online_status
 	self.sk.OnUserAuthorizationRequestReceived = self.on_authz
 	self.sk.OnMessageStatus = self.on_message
+	self.sk.OnAsyncSearchUsersFinished = self.on_search_finished
+	
         print 'Attached as %s - %s. Balance: %s' % (self.sk.CurrentUser.Handle, self.sk.CurrentUser.FullName, self.sk.CurrentUserProfile.BalanceToText)
 	for f in self.sk.Friends:
 	    print self.user_names(f)
@@ -45,6 +47,13 @@ class SkypeServer(object):
 
     def user_names(self, u):
 	return '%s/%s/%s/%s' % (u.Handle, u.DisplayName, u.FullName, u.OnlineStatus)
+
+    def on_search_finished(self, sid, users):
+	l = len(users)
+	for i, user in enumerate(users):
+	    print '%s Found %d/%d: %s' % (timestamp(), i + 1, l, self.user_names(user)) 
+	sys.stdout.flush()
+	    
 
     def on_message(self, chat, status):
 	if status in ('RECEIVED','SENDING'):
@@ -113,8 +122,9 @@ class SkypeServer(object):
     def chat(self, user, msg):
 	c = self.sk.CreateChatWith(user)
 	c.SendMessage(msg)
-    
 
+    def search(self, name):
+	self.sk.AsyncSearchUsers(name)
     
 class SkypeObject(dbus.service.Object):
     @dbus.service.method(I_NAME, in_signature = '', out_signature = '')
@@ -154,6 +164,11 @@ class SkypeObject(dbus.service.Object):
     @dbus.service.method(I_NAME, in_signature = 'ss', out_signature = '')
     def chat(self, user, msg):
 	self.skype.chat(user, msg)
+
+    @dbus.service.method(I_NAME, in_signature = 's', out_signature = '')
+    def search(self, name):
+	self.skype.search(name)
+
 
 def main():
     main_loop = dbus.mainloop.glib.DBusGMainLoop(set_as_default = True)
