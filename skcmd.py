@@ -119,6 +119,12 @@ class SkypeServer(object):
 	user = self.sk.User(name)
 	user.IsAuthorized = True if status == '1' else False
 
+    def add_contact(self, name, msg):
+	if not msg:
+	    msg = 'Can I add you as a friend?'
+	user = self.sk.User(name)
+	user.SetBuddyStatusPendingAuthorization(msg)
+
     def chat(self, user, msg):
 	c = self.sk.CreateChatWith(user)
 	c.SendMessage(msg)
@@ -160,6 +166,11 @@ class SkypeObject(dbus.service.Object):
     @dbus.service.method(I_NAME, in_signature = 'ss', out_signature = '')
     def authz(self, user, status):
 	self.skype.authz(user, status)
+
+    @dbus.service.method(I_NAME, in_signature = 's', out_signature = '')
+    def add_contact(self, user):
+	self.skype.add_contact(user, msg = None)
+	
 
     @dbus.service.method(I_NAME, in_signature = 'ss', out_signature = '')
     def chat(self, user, msg):
