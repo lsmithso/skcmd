@@ -7,5 +7,7 @@ setup(name='skcmd',
       author_email='lsmithso@hare.demon.co.uk',
       url='http://open-networks.co.uk',
       scripts = ['skcmd.py'],
+      provides=['skcmd'],
+
 
       )
