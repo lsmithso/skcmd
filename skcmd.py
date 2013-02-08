@@ -1,12 +1,6 @@
 #!/usr/bin/env python
 
 
-# TODO:
-# Delay before auto-answering
-# auto accept new contacts
-# Add new contact
-# Emacs lisp bindings#
-
 
 import sys, datetime
 import gobject
