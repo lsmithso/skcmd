@@ -1,4 +1,4 @@
-* skcmd.py0.0.2  - A command line interface to Skype
+* skcmd.py0.0.3  - A command line interface to Skype
 ** Introduction
 
 skcmd.py is a command line interface to Skype. It is implemented as a client/server  pair. It has no GUI components at all and is designed for ease of use by the VI. 
@@ -77,6 +77,8 @@ is the Skype id printed in the 1st column of the 'contacts' command.
 add_contact  - Sends an authz requests to handle
 search = Search for a Skype user
 chat - chat to to the user with handle.
+status  Set your status to DND, INVISIBLE  etc
+   nood - set your mood message
 help - A breif help message.
 
 
