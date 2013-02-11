@@ -28,6 +28,7 @@ class SkypeServer(object):
         self.state = None
         self.call = None
         self.sk = sk.Skype(RunMainLoop = False)
+	self.sk.Timeout = 60000
         if not self.sk.Client.IsRunning:
             self.sk.Client.Start()
 
