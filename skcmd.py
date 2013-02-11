@@ -139,6 +139,10 @@ class SkypeServer(object):
 
     def change_status(self, status):
 	self.sk.CurrentUserStatus = status.upper()
+
+    def change_mood(self, mood):
+	self.sk.CurrentUserProfile.MoodText = mood
+	
     
 class SkypeObject(dbus.service.Object):
     @dbus.service.method(I_NAME, in_signature = '', out_signature = '')
@@ -192,6 +196,10 @@ class SkypeObject(dbus.service.Object):
     def status(self, st):
 	self.skype.change_status(st)
 
+    @dbus.service.method(I_NAME, in_signature = 's', out_signature = '')
+    def mood(self, mood_text):
+	self.skype.change_mood(mood_text)
+
 
 def main():
     main_loop = dbus.mainloop.glib.DBusGMainLoop(set_as_default = True)
@@ -228,6 +236,8 @@ if __name__ == '__main__':
 	    print '\n'.join(c.command(*sys.argv[1:]))
 	elif sys.argv[1] == 'chat':
 	    c.command(sys.argv[1], sys.argv[2], ' '.join(sys.argv[3:]))
+	elif sys.argv[1] == 'mood':	
+	    c.command(sys.argv[1], ' '.join(sys.argv[2:]))
 	elif sys.argv[1] =='help':
 	    print '\n'.join(c.command_list())
 	else:
