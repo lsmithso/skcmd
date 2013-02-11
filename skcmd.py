@@ -39,7 +39,7 @@ class SkypeServer(object):
 	self.sk.OnMessageStatus = self.on_message
 	self.sk.OnAsyncSearchUsersFinished = self.on_search_finished
 	
-        print 'Attached as %s - %s. Balance: %s' % (self.sk.CurrentUser.Handle, self.sk.CurrentUser.FullName, self.sk.CurrentUserProfile.BalanceToText)
+        print timestamp(), 'Attached as %s - %s. Balance: %s' % (self.sk.CurrentUser.Handle, self.sk.CurrentUser.FullName, self.sk.CurrentUserProfile.BalanceToText)
 	for f in self.sk.Friends:
 	    print self.user_names(f)
 	sys.stdout.flush()
@@ -147,7 +147,7 @@ class SkypeObject(dbus.service.Object):
     
     @dbus.service.method(I_NAME, in_signature = '', out_signature = '')
     def exit(self):
-        print 'exit on client command'
+        print timestamp(), 'exit on client command'
         sys.exit(0)
         
     @dbus.service.method(I_NAME, in_signature = 's', out_signature = 's')
