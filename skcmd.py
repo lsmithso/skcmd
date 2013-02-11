@@ -38,6 +38,7 @@ class SkypeServer(object):
 	self.sk.OnUserAuthorizationRequestReceived = self.on_authz
 	self.sk.OnMessageStatus = self.on_message
 	self.sk.OnAsyncSearchUsersFinished = self.on_search_finished
+	self.sk.OnUserMood = self.on_user_mood
 	
         print timestamp(), 'Attached as %s - %s. Balance: %s' % (self.sk.CurrentUser.Handle, self.sk.CurrentUser.FullName, self.sk.CurrentUserProfile.BalanceToText)
 	for f in self.sk.Friends:
@@ -47,6 +48,11 @@ class SkypeServer(object):
     def user_names(self, u):
 	return '%s/%s/%s/%s' % (u.Handle, u.DisplayName, u.FullName, u.OnlineStatus)
 
+    def on_user_mood(self, user, mood):
+	print '%s User %s mood %s' % (timestamp(), self.user_names(user), mood)
+	sys.stdout.flush()
+	self.signal_call_status(user.Handle, mood)
+		
     def on_search_finished(self, sid, users):
 	l = len(users)
 	for i, user in enumerate(users):
