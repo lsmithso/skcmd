@@ -130,6 +130,9 @@ class SkypeServer(object):
 
     def search(self, name):
 	self.sk.AsyncSearchUsers(name)
+
+    def change_status(self, status):
+	self.sk.CurrentUserStatus = status.upper()
     
 class SkypeObject(dbus.service.Object):
     @dbus.service.method(I_NAME, in_signature = '', out_signature = '')
@@ -178,6 +181,10 @@ class SkypeObject(dbus.service.Object):
     @dbus.service.method(I_NAME, in_signature = 's', out_signature = '')
     def search(self, name):
 	self.skype.search(name)
+
+    @dbus.service.method(I_NAME, in_signature = 's', out_signature = '')
+    def status(self, st):
+	self.skype.change_status(st)
 
 
 def main():
