@@ -2,13 +2,18 @@
 
 
 
-import sys, datetime
+import sys, datetime, os
 import gobject
 import dbus
 import dbus.service
 import dbus.mainloop.glib
 import glib
+import logging
 import Skype4Py as sk
+
+if os.getenv('SKCMD_DEBUG'):
+    logging.basicConfig(level=logging.DEBUG)                                                      
+
 
 I_NAME = "uk.co.opennet.skypecmd_interface"
 S_NAME = "uk.co.opennet.skypecmd_service"
@@ -22,7 +27,7 @@ class SkypeServer(object):
 	self.auto_answer = False
         self.state = None
         self.call = None
-        self.sk = sk.Skype()
+        self.sk = sk.Skype(RunMainLoop = False)
         if not self.sk.Client.IsRunning:
             self.sk.Client.Start()
 
