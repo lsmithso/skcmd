@@ -1,6 +1,6 @@
 from distutils.core import setup
 setup(name='skcmd',
-      version='0.0.3',
+      version='0.0.4',
       py_modules=['skcmd'],
       description='Command line interface to Skype',
       author='Les Smithson',

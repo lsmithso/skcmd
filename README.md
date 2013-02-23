@@ -1,4 +1,4 @@
-* skcmd.py0.0.3  - A command line interface to Skype
+* skcmd.py0.0.4  - A command line interface to Skype
 ** Introduction
 
 skcmd.py is a command line interface to Skype. It is implemented as a client/server  pair. It has no GUI components at all and is designed for ease of use by the VI. 
@@ -22,8 +22,10 @@ sudo python setup.py install
 
 I've tested skcmd with version 1.0.34. Earlier versions are unusable due to a threading bug.
 
-Install skcmd by unpacking the tarball this file came from and:
+Install skcmd:
 
+  git clone http://github.com:/lsmithso/skcmd.git
+  cd skcmd
   sudo python setup.py install
 
 
@@ -75,10 +77,15 @@ call handle - Place an outbound call to the user with handle. Handle
 is the Skype id printed in the 1st column of the 'contacts' command.
 
 add_contact  - Sends an authz requests to handle
+
 search = Search for a Skype user
+
 chat - chat to to the user with handle.
+
 status  Set your status to DND, INVISIBLE  etc
-   nood - set your mood message
+
+   mood - set your mood message
+
 help - A breif help message.
 
 
