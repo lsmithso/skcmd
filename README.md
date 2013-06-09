@@ -76,6 +76,8 @@ answer - Answer the current inbound call.
 call handle - Place an outbound call to the user with handle. Handle
 is the Skype id printed in the 1st column of the 'contacts' command.
 
+tone tones - send DTMF tones, ie for POTS conferencing.
+
 add_contact  - Sends an authz requests to handle
 
 search = Search for a Skype user

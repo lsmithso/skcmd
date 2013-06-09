@@ -106,6 +106,12 @@ class SkypeServer(object):
         self.sk.PlaceCall(contact)
         self.state = 'call placed'
 
+    def tone(self, v):
+        if self.call:
+	    for t in v:
+		if t in '0123456789#*':
+		    self.call.DTMF = t
+	    
     def finish(self):
         if self.call:
             self.call.Finish()
@@ -153,7 +159,12 @@ class SkypeObject(dbus.service.Object):
     @dbus.service.method(I_NAME, in_signature = '', out_signature = '')
     def hangup(self):
         self.skype.finish()
-    
+
+
+    @dbus.service.method(I_NAME, in_signature = 's', out_signature = '')
+    def tone(self, v):
+        self.skype.tone(v)
+
     @dbus.service.signal(dbus_interface = I_NAME, signature='ss')
     def signal_call_status(self, caller_id, status):
         pass
