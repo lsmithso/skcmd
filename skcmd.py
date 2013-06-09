@@ -248,8 +248,11 @@ if __name__ == '__main__':
 	    print '\n'.join(c.command(*sys.argv[1:]))
 	elif sys.argv[1] == 'chat':
 	    c.command(sys.argv[1], sys.argv[2], ' '.join(sys.argv[3:]))
-	elif sys.argv[1] == 'mood':	
+	elif sys.argv[1] == 'mood':
 	    c.command(sys.argv[1], ' '.join(sys.argv[2:]))
+	elif sys.argv[1] in ('call', 'tone'):
+	    c.command(sys.argv[1], ''.join(sys.argv[2:]))
+	    
 	elif sys.argv[1] =='help':
 	    print '\n'.join(c.command_list())
 	else:
