@@ -111,5 +111,10 @@ This software comes with absolutely no warranty whatsoever, and comes
 AS-IS.  Do what you want with itt. I take no responsibility whatsoever
 for it.
 
+* Changes
+Add tone command.
+concat call and tone args into spaceless string.
+
+
 
 
