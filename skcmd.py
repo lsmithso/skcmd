@@ -40,14 +40,19 @@ class SkypeServer(object):
 	self.sk.OnMessageStatus = self.on_message
 	self.sk.OnAsyncSearchUsersFinished = self.on_search_finished
 	self.sk.OnUserMood = self.on_user_mood
+
+
 	
-        print timestamp(), 'Attached as %s - %s. Balance: %s' % (self.sk.CurrentUser.Handle, self.sk.CurrentUser.FullName, self.sk.CurrentUserProfile.BalanceToText)
+        print timestamp(), 'Attached as %s - %s. Balance: %s vm: %d missed: %d' % (self.sk.CurrentUser.Handle, self.sk.CurrentUser.FullName, self.sk.CurrentUserProfile.BalanceToText, len(self.sk.Voicemails), len(self.sk.MissedVoicemails))
 	for f in self.sk.Friends:
 	    print self.user_names(f)
 	sys.stdout.flush()
 
     def user_names(self, u):
-	return '%s/%s/%s/%s' % (u.Handle, u.DisplayName, u.FullName, u.OnlineStatus)
+	rv = '%s/%s/%s/%s' % (u.Handle, u.DisplayName, u.FullName, u.OnlineStatus, )
+	if u.IsVoicemailCapable:
+	    rv += '/vm'
+	return rv
 
     def on_user_mood(self, user, mood):
 	print '%s User %s mood %s' % (timestamp(), self.user_names(user), mood)
@@ -149,7 +154,14 @@ class SkypeServer(object):
 
     def change_mood(self, mood):
 	self.sk.CurrentUserProfile.MoodText = mood
-	
+
+    def voicemails(self):
+	print 'vms'
+	print len(self.sk.MissedVoicemails)
+	#print self.sk.Voicemails
+	for vm in self.sk.Voicemails:
+	    print vm
+	    
     
 class SkypeObject(dbus.service.Object):
     @dbus.service.method(I_NAME, in_signature = '', out_signature = '')
@@ -211,6 +223,10 @@ class SkypeObject(dbus.service.Object):
     @dbus.service.method(I_NAME, in_signature = 's', out_signature = '')
     def mood(self, mood_text):
 	self.skype.change_mood(mood_text)
+
+    @dbus.service.method(I_NAME, in_signature = '', out_signature = '')
+    def vms(self):
+	self.skype.voicemails()
 
 
 def main():
