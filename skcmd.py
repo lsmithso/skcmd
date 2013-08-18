@@ -111,6 +111,11 @@ class SkypeServer(object):
         self.sk.PlaceCall(contact)
         self.state = 'call placed'
 
+    def  call_vm(self, contact):
+        self.sk.SendVoicemail(contact)
+        self.state = 'call placed'
+	
+
     def tone(self, v):
         if self.call:
 	    for t in v:
@@ -167,6 +172,10 @@ class SkypeObject(dbus.service.Object):
     @dbus.service.method(I_NAME, in_signature = '', out_signature = '')
     def call(self, contact ):
         return self.skype.place_call(contact)
+
+    @dbus.service.method(I_NAME, in_signature = '', out_signature = '')
+    def callvm(self, contact ):
+        return self.skype.call_vm(contact)
 
     @dbus.service.method(I_NAME, in_signature = '', out_signature = '')
     def hangup(self):
@@ -230,7 +239,7 @@ class SkypeObject(dbus.service.Object):
 
 
 def main():
-    main_loop = dbus.mainloop.glib.DBusGMainLoop(set_as_default = True)
+    mainloop1 = dbus.mainloop.glib.DBusGMainLoop(set_as_default = True)
 
     session_bus = dbus.SessionBus()
     name = dbus.service.BusName(S_NAME, session_bus)
