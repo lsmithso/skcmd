@@ -1,3 +1,11 @@
+try:
+    from setuptools import setup, find_packages
+except ImportError:
+    from ez_setup import use_setuptools
+    use_setuptools()
+    from setuptools import setup, find_packages
+
+
 from distutils.core import setup
 setup(name='skcmd',
       version='0.0.4',
