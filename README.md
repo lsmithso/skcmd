@@ -14,16 +14,14 @@ skcnd.py depends on a running Skype desktop, and the skype4py package.
 
 ## Install
 
-Install the Python skype4py package:
-
+You may need to apt-get install some prerequisites:
 
 ```
-git clone git://github.com/awahlig/skype4py.git
-cd skype4py
-sudo python setup.py install
-```
+sudo apt-get install python-dev
+sudo apt-get install python-gobject
 
-I've tested skcmd with version 1.0.34. Earlier versions are unusable due to a threading bug.
+  ```
+
 
 Install skcmd:
 
@@ -34,7 +32,12 @@ Install skcmd:
   sudo python setup.py install
 ```
 
+This should automatically install  Python package dependancies, including skype4py.
+
+
 ## Run
+
+### Starting
 
 Start the Skype desktop program as normal and sign in
 
@@ -46,8 +49,16 @@ The Skype desktop will prompt for an authorization of this program the first tim
 
 When the server starts, it logs who you are signed in as, then a list
 of all your contacts. It then blocks, waiting for client commands or
-Skype status changes.   All client commands must be run from a separate terminal window.
+Skype status changes.   
 
+### Client Commands
+
+All client commands must be run from a separate terminal window.  The
+normal Skype desktop continues to run, so you will hear the usual
+ringing and contact status change sounds.
+
+
+### Voice calls
 
 To make a call, run the client call command, using the skype handle:
 
@@ -60,8 +71,48 @@ Inbound calls are logged by the server. To answer  a call run:
 
       skcmd.py answer
 
-Throughout this the normal Skype desktop continues to run, so you will
-hear the usual ringing and contact status change sounds.
+### Chatting
+
+To send a chat message:
+
+     skcmd.py chat handle [chat message to send]
+
+Sends its arguments as a chat message to the Skype user with
+handle. If no message argument is given, then stdin is read and sent
+until an empty line or EOF is input. The later is useful for sending
+special shell characters without quoting.
+
+### Voicemails
+
+Voicemails can be listed, played and deleted. You must enable your
+voicemail inbox using the Skype GUI.
+
+To list the contents of your voicemail inbox:
+
+    skcmd.py vms
+
+This lists each voicemail message as as an index number, the display
+name/handle of the caller, call date/time/ duration. and voicemail
+status. The index is a small integer used to refer to the voicemail in
+other vm commands.
+
+Play a voicemail with:
+
+    skcmd.py vmplay idx
+
+Where idx the index number of the message displayed by the vms command.
+
+Stop the currently playing voicemail with:
+
+    skcmd.py vmstop
+
+Delete a voicemail with:
+
+    skcmd.py vmdelete idx
+
+The voicemail list is re-indexed after each message is deleted.
+
+### Command List
 
 The complete list of client commands are:
 
@@ -92,6 +143,14 @@ chat - chat to to the user with handle.
 status  Set your status to DND, INVISIBLE  etc
 
    mood - set your mood message
+
+  vms - List all voicemails,.
+
+  vmplay idx - Play the voicemail with index number idx
+
+  vmstop - Stop the currently playing voicemail
+
+  vmdelete idx - Delete the voicemail with id idx
 
 help - A breif help message.
 
