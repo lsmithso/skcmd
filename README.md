@@ -17,22 +17,22 @@ skcnd.py depends on a running Skype desktop, and the skype4py package.
 Install the Python skype4py package:
 
 
-``
+```
 git clone git://github.com/awahlig/skype4py.git
 cd skype4py
 sudo python setup.py install
-``
+```
 
 I've tested skcmd with version 1.0.34. Earlier versions are unusable due to a threading bug.
 
 Install skcmd:
 
 
-``
+```
   git clone http://github.com:/lsmithso/skcmd.git
   cd skcmd
   sudo python setup.py install
-``
+```
 
 ## Run
 
