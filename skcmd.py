@@ -320,7 +320,15 @@ if __name__ == '__main__':
 	if sys.argv[1] == 'contacts':
 	    print '\n'.join(c.command(*sys.argv[1:]))
 	elif sys.argv[1] == 'chat':
-	    c.command(sys.argv[1], sys.argv[2], ' '.join(sys.argv[3:]))
+	    if len(sys.argv) == 3:
+		# No chat message on cmd line
+		while True:
+		    l = raw_input('? ')
+		    if not l:
+			break
+		    c.command(sys.argv[1], sys.argv[2], l)
+	    else:
+		c.command(sys.argv[1], sys.argv[2], ' '.join(sys.argv[3:]))
 	elif sys.argv[1] == 'mood':
 	    c.command(sys.argv[1], ' '.join(sys.argv[2:]))
 	elif sys.argv[1] in ('call', 'tone'):
