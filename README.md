@@ -1,5 +1,5 @@
-* skcmd.py0.0.4  - A command line interface to Skype
-** Introduction
+# skcmd.py0.0.4  - A command line interface to Skype
+##Introduction
 
 skcmd.py is a command line interface to Skype. It is implemented as a client/server  pair. It has no GUI components at all and is designed for ease of use by the VI. 
 
@@ -12,24 +12,29 @@ outgoing/incoming/ calls etc.
 
 skcnd.py depends on a running Skype desktop, and the skype4py package.
 
-** Install
+## Install
 
 Install the Python skype4py package:
 
+
+```
 git clone git://github.com/awahlig/skype4py.git
 cd skype4py
 sudo python setup.py install
+```
 
 I've tested skcmd with version 1.0.34. Earlier versions are unusable due to a threading bug.
 
 Install skcmd:
 
+
+```
   git clone http://github.com:/lsmithso/skcmd.git
   cd skcmd
   sudo python setup.py install
+```
 
-
-** Run
+## Run
 
 Start the Skype desktop program as normal and sign in
 
@@ -46,14 +51,14 @@ Skype status changes.   All client commands must be run from a separate terminal
 
 To make a call, run the client call command, using the skype handle:
 
- skcmd.py call echo123  
+ s    kcmd.py call echo123  
 
 All being well, This should initiate a call to the Skype call test service.  Look for Skype status messages in the server terminal window.
 
 
 Inbound calls are logged by the server. To answer  a call run:
 
- skcmd.py answer
+      skcmd.py answer
 
 Throughout this the normal Skype desktop continues to run, so you will
 hear the usual ringing and contact status change sounds.
@@ -91,7 +96,7 @@ status  Set your status to DND, INVISIBLE  etc
 help - A breif help message.
 
 
-** Skype status changes
+## Skype status changes
 
 The server logs some Skype status messages to stdout, and  signals them on D-Bus.
 
@@ -105,7 +110,7 @@ skcmd also signal D-Bus with these status messages. A simple skcmd.el is include
 
 
 
-** Disclaimer
+## Disclaimer
 
 This software comes with absolutely no warranty whatsoever, and comes
 AS-IS.  Do what you want with itt. I take no responsibility whatsoever
