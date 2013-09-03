@@ -1,7 +1,10 @@
-# skcmd.py0.0.4  - A command line interface to Skype
+# skcmd.py0.0.5  - A command line interface to Skype
 ##Introduction
 
-skcmd.py is a command line interface to Skype. It is implemented as a client/server  pair. It has no GUI components at all and is designed for ease of use by the VI. 
+skcmd.py is a command line interface to Skype. It is implemented as a
+client/server pair. It has no GUI components at all and is designed
+for ease of use by the VI/blind. It offers a reduced set of
+functionality, keeping the CLI simple and avoiding bloat.
 
 The server logs Skype status messages to stdout, and executes Skype
 commands on behalf of the client. In particular it logs incomming calls, friend  status changes and authz requests.
@@ -10,9 +13,20 @@ The client is a command line program that sends Skype requests to the
 server for execution .  It is asynchronous and does not block on
 outgoing/incoming/ calls etc.
 
-skcnd.py depends on a running Skype desktop, and the skype4py package.
+skcnd.py depends on a running Skype desktop, and the skype4py
+package. This in turn depends on the availability of the Skype Desktop
+API.  See the note below about the likely demise of this interface and
+the apps that depend on it.
+
+
 
 ## Install
+
+skcmd.py will only work with Python 2.x and will not work with Python
+3.  It has been tested on Vinux 4.0, but should work on any modern
+Linux distro. Orca and a TTS are not a requirement, but are of course
+needed if you're VI/blind.
+
 
 You may need to apt-get install some prerequisites:
 
@@ -25,6 +39,13 @@ sudo apt-get install python-gobject
 
 Install skcmd:
 
+The simplest way is to install from the Python Cheeseshop:
+
+    sudo easy_install skcmd
+
+ 
+
+Alternatively install directly from the github repo:
 
 ```
   git clone http://github.com:/lsmithso/skcmd.git
@@ -175,9 +196,43 @@ This software comes with absolutely no warranty whatsoever, and comes
 AS-IS.  Do what you want with itt. I take no responsibility whatsoever
 for it.
 
-* Changes
+# The Demise of the Skype Desktop API
+
+skcmd.py and all other Skype apps depend on the availability of the
+Skype Desktop API. This is a rich programming interface that makes
+just about all Skype desktop functionality available to apps. It
+allows inventive and powerful 3rd party telephony apps to be built
+around Skype for free. It is a mature and well documented part of the
+Skype ecosystem.
+
+In July 2013 Microsoft announced that they were killing off this API
+in favour of a new SkypeURI interface.  This interface has vastly
+reduced functionality, to the point where its almost useless.
+SkypeURI is unusable for skcmd, and I suspect for a lot of other apps
+too.
+
+The announcement says that the Desktop API will begin to stop working
+in September 2013, and that apps should start using SkypeURI right
+away.
+
+SkypeURI is not currently available for Linux, so if the Desktop API
+does stop working, skcmd.py is sunk. Even when it does become
+available, it is of no use at all, so skcmd.py is still sunk.
+
+As of September 3 2013, skcmd.py was still fully functioning, so enjoy
+it while you can!
+
+
+
+
+
+# Significant Changes
+## 0.0.5
 Add tone command.
+Add  voicemail list, play, stop , delete commands
 concat call and tone args into spaceless string.
+Add multiline chat
+
 
 
 
