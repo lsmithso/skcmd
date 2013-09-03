@@ -27,6 +27,8 @@ class SkypeServer(object):
 	self.auto_answer = False
         self.state = None
         self.call = None
+	self.vm_id = None
+	
         self.sk = sk.Skype(RunMainLoop = False)
 	self.sk.Timeout = 60000
         if not self.sk.Client.IsRunning:
@@ -40,14 +42,19 @@ class SkypeServer(object):
 	self.sk.OnMessageStatus = self.on_message
 	self.sk.OnAsyncSearchUsersFinished = self.on_search_finished
 	self.sk.OnUserMood = self.on_user_mood
+
+
 	
-        print timestamp(), 'Attached as %s - %s. Balance: %s' % (self.sk.CurrentUser.Handle, self.sk.CurrentUser.FullName, self.sk.CurrentUserProfile.BalanceToText)
+        print timestamp(), 'Attached as %s - %s. Balance: %s vm: %d missed: %d' % (self.sk.CurrentUser.Handle, self.sk.CurrentUser.FullName, self.sk.CurrentUserProfile.BalanceToText, len(self.sk.Voicemails), len(self.sk.MissedVoicemails))
 	for f in self.sk.Friends:
 	    print self.user_names(f)
 	sys.stdout.flush()
 
     def user_names(self, u):
-	return '%s/%s/%s/%s' % (u.Handle, u.DisplayName, u.FullName, u.OnlineStatus)
+	rv = '%s/%s/%s/%s' % (u.Handle, u.DisplayName, u.FullName, u.OnlineStatus, )
+	if u.IsVoicemailCapable:
+	    rv += '/vm'
+	return rv
 
     def on_user_mood(self, user, mood):
 	print '%s User %s mood %s' % (timestamp(), self.user_names(user), mood)
@@ -106,6 +113,8 @@ class SkypeServer(object):
         self.sk.PlaceCall(contact)
         self.state = 'call placed'
 
+	
+
     def tone(self, v):
         if self.call:
 	    for t in v:
@@ -149,12 +158,34 @@ class SkypeServer(object):
 
     def change_mood(self, mood):
 	self.sk.CurrentUserProfile.MoodText = mood
+
+    def vm_play(self, vm_id):
+	self.vm_id = vm_id
+	vm = self.sk.Voicemail(vm_id)
+	if self.call:
+	    vm.StartPlaybackInCall()
+	else:
+	    vm.StartPlayback()
 	
+
+
+    def vm_stop_playback(self):
+	vm = self.sk.Voicemail(self.vm_id)
+	vm.StopPlayback()
+	
+
+
+    def vm_delete(self, vm_id):
+	vm = self.sk.Voicemail(vm_id)
+	vm.Delete()
+
+	    
     
 class SkypeObject(dbus.service.Object):
     @dbus.service.method(I_NAME, in_signature = '', out_signature = '')
     def call(self, contact ):
         return self.skype.place_call(contact)
+
 
     @dbus.service.method(I_NAME, in_signature = '', out_signature = '')
     def hangup(self):
@@ -212,9 +243,21 @@ class SkypeObject(dbus.service.Object):
     def mood(self, mood_text):
 	self.skype.change_mood(mood_text)
 
+    @dbus.service.method(I_NAME, in_signature = 'i', out_signature = '')
+    def vmplay(self, vm_id):
+	self.skype.vm_play(vm_id)
+
+    @dbus.service.method(I_NAME, in_signature = '', out_signature = '')
+    def vmstop(self):
+	self.skype.vm_stop_playback()
+
+
+    @dbus.service.method(I_NAME, in_signature = 'i', out_signature = '')
+    def vmdelete(self, vm_id):
+	self.skype.vm_delete(vm_id)
 
 def main():
-    main_loop = dbus.mainloop.glib.DBusGMainLoop(set_as_default = True)
+    mainloop1 = dbus.mainloop.glib.DBusGMainLoop(set_as_default = True)
 
     session_bus = dbus.SessionBus()
     name = dbus.service.BusName(S_NAME, session_bus)
@@ -234,29 +277,70 @@ class SkypeClient(object):
         self.remote_object = self.bus.get_object(S_NAME, '/SkypeObject')
 
     def command(self, cmd, *args):
-        return getattr(self.remote_object, cmd)(*args)
+	return getattr(self.remote_object, cmd)(*args)
 
     def command_list(self):
 	return [x  for x in SkypeObject.__dict__ if x[0] != '_']
+
+	
+
+
+class ClientVM(object):
+    # Listing voicemails in the server hangs but all other vm ops work
+    # fine. The workaround is to attach to skype in the client to get
+    # the vm list and to map vm ids to a small integer. When making
+    # server voicemail calls (ie play), the small integer is mapped to
+    # a voicemail id, which the server then maps to a voicemail
+    # object.
+    
+    def  __init__(self):
+	self.skc = sk.Skype()
+	self.skc.Attach()
+
+    def idx_2_id(self, idx):
+	vms = self.skc.Voicemails
+	return vms[idx].Id
+	    
+    def print_vms(self):
+	vms = self.skc.Voicemails
+	for i, vm in enumerate(vms):
+	    print '%d: %s/%s %s/%s %s' % (i, vm.PartnerDisplayName, vm.PartnerHandle, vm.Datetime,vm.Duration, vm.Status)
+	    
     
 if __name__ == '__main__':
     if sys.argv[1] == 's':
-        main()    
+        main()
+	sys.exit(0)
+    if sys.argv[1].startswith('vm'):
+	vmc = ClientVM()
+    if sys.argv[1] == 'vms':
+	vmc.print_vms()
     else:
         c = SkypeClient()
 	if sys.argv[1] == 'contacts':
 	    print '\n'.join(c.command(*sys.argv[1:]))
 	elif sys.argv[1] == 'chat':
-	    c.command(sys.argv[1], sys.argv[2], ' '.join(sys.argv[3:]))
+	    if len(sys.argv) == 3:
+		# No chat message on cmd line
+		while True:
+		    l = raw_input('? ')
+		    if not l:
+			break
+		    c.command(sys.argv[1], sys.argv[2], l)
+	    else:
+		c.command(sys.argv[1], sys.argv[2], ' '.join(sys.argv[3:]))
 	elif sys.argv[1] == 'mood':
 	    c.command(sys.argv[1], ' '.join(sys.argv[2:]))
 	elif sys.argv[1] in ('call', 'tone'):
 	    c.command(sys.argv[1], ''.join(sys.argv[2:]))
-	    
+	elif  sys.argv[1] in ('vmplay', 'vmdelete'):
+	    vm_id = vmc.idx_2_id(int(sys.argv[2]))
+	    c.command(sys.argv[1], vm_id)
 	elif sys.argv[1] =='help':
 	    print '\n'.join(c.command_list())
 	else:
 	    rsp =  c.command(*sys.argv[1:])
 	    if rsp:
 		print rsp
+
 
