@@ -45,7 +45,7 @@ class SkypeServer(object):
 
 
 	
-        print timestamp(), 'Attached as %s - %s. Balance: %s vm: %d missed: %d' % (self.sk.CurrentUser.Handle, self.sk.CurrentUser.FullName, self.sk.CurrentUserProfile.BalanceToText, len(self.sk.Voicemails), len(self.sk.MissedVoicemails))
+        print timestamp(), '%s vm: %d missed: %d' % (self.status(), len(self.sk.Voicemails), len(self.sk.MissedVoicemails))
 	for f in self.sk.Friends:
 	    print self.user_names(f)
 	sys.stdout.flush()
@@ -179,7 +179,10 @@ class SkypeServer(object):
 	vm = self.sk.Voicemail(vm_id)
 	vm.Delete()
 
-	    
+    def status(self):
+        return 'Attached as %s - %s. Balance: %s' % (self.sk.CurrentUser.Handle, self.sk.CurrentUser.FullName, self.sk.CurrentUserProfile.BalanceToText)
+
+    
     
 class SkypeObject(dbus.service.Object):
     @dbus.service.method(I_NAME, in_signature = '', out_signature = '')
@@ -256,6 +259,11 @@ class SkypeObject(dbus.service.Object):
     def vmdelete(self, vm_id):
 	self.skype.vm_delete(vm_id)
 
+    @dbus.service.method(I_NAME, in_signature = '', out_signature = 's')
+    def me(self):
+        return self.skype.status()
+
+        
 def main():
     mainloop1 = dbus.mainloop.glib.DBusGMainLoop(set_as_default = True)
 
