@@ -1,0 +1,13 @@
+x Add mood + status
+Add regex match for call, chat etc targets.  Add arg to comtacts - a
+regex to match against handle, email, full name. Leave call etc as
+exact handle.
+pulseaudio mute all other sink inputs
+status by itself prints users status = signed in name, balance, mood, vms
+check id in chat messages and ignore if duplicated. Age cache.
+Add chat replay for current most recent chat.
+Fix dup chat rx.
+Add conversation record
+Add TTS speak of input, ie for credit card numbers etc
+
+
