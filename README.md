@@ -1,4 +1,4 @@
-# skcmd.py0.0.5  - A command line interface to Skype
+# skcmd.py0.0.6  - A command line interface to Skype
 ##Introduction
 
 skcmd.py is a command line interface to Skype. It is implemented as a
