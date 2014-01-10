@@ -1,1 +1,1 @@
-include *.py *.el README.txt
+include *.py *.el README.md
