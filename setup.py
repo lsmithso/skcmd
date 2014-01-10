@@ -8,7 +8,7 @@ except ImportError:
 
 from distutils.core import setup
 setup(name='skcmd',
-      version='0.0.5',
+      version='0.0.6',
       py_modules=['skcmd'],
       description='Command line interface to Skype',
 long_description = file('README.md').read(),

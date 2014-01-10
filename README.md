@@ -173,6 +173,8 @@ status  Set your status to DND, INVISIBLE  etc
 
   vmdelete idx - Delete the voicemail with id idx
 
+  me  - print your skype id/screen name and your current balance.
+
 help - A breif help message.
 
 
@@ -233,6 +235,8 @@ Add  voicemail list, play, stop , delete commands
 concat call and tone args into spaceless string.
 Add multiline chat
 
+##  0.0.6
+Add 'me' command
 
 
 
