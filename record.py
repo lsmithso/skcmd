@@ -20,9 +20,22 @@ class PulseAudioDefaults(object):
                 self.default_source_name = match.group(1)
             if self.default_sink_name and self.default_source_name:
                 break
+        if self.default_sink_name:
+            self.default_sink = self.get_ssid(self.default_sink_name + '.monitor')
+        if self.default_source_name:
+            self.default_source = self.get_ssid(self.default_source_name)
 
+    def  get_ssid(self, device_name):
+        cmd = 'pactl list sources short' 
+        p = subprocess.Popen(cmd.split(), stdin=None, stdout=subprocess.PIPE, stderr=sys.stderr)
+        for l in  p.stdout.readlines():
+            tid, tdn = l.split()[:2]
+            if  tdn ==  device_name:
+                return tid
+
+                
     def __str__(self):
-        return 'Default sink: %s Default Source: %s' % (self.default_sink, self.default_source)
+        return 'Default sink: %s/%s Default Source: %s/%s' % (self.default_sink, self.default_sink_name, self.default_source, self.default_source_name)
             
 
 
@@ -35,7 +48,7 @@ class  Record(object):
         pad = PulseAudioDefaults()
         pipe_template = 'pulsesrc device=%s ! adder name=mix ! audioconvert ! vorbisenc ! oggmux  ! filesink location=%s pulsesrc device=%s ! queue ! mix.'
         pipeline = pipe_template % (pad.default_sink, self.make_filename(), pad.default_source)
-        print pipeline
+        print 'pipeline', pipeline
         self.pipeline =  gst.parse_launch(pipeline)
 
 
@@ -49,12 +62,11 @@ class  Record(object):
         self.pipeline.set_state(gst.STATE_NULL)
             
     def make_filename(self):
-        # TODO: remove whitespace from file basename
         if not os.path.exists(self.RECORDING_DIR):
             os.mkdir(self.RECORDING_DIR)
         
         now = datetime.datetime.now()
-        filename = '%s_%s.ogg' % (self.filename_base, now.strftime('%Y%m%d%H%M%S'))
+        filename = '%s_%s.ogg' % (self.filename_base.replace(' ', ''), now.strftime('%Y%m%d%H%M%S'))
         return os.path.join(self.RECORDING_DIR, filename)
         
 
