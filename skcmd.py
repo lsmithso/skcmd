@@ -10,6 +10,7 @@ import dbus.mainloop.glib
 import glib
 import logging
 import Skype4Py as sk
+import record
 
 if os.getenv('SKCMD_DEBUG'):
     logging.basicConfig(level=logging.DEBUG)
@@ -28,6 +29,7 @@ class SkypeServer(object):
         self.state = None
         self.call = None
         self.vm_id = None
+        self.recorder = record.Record()
 
         self.sk = sk.Skype(RunMainLoop = False)
         self.sk.Timeout = 60000
@@ -102,6 +104,7 @@ class SkypeServer(object):
         sys.stdout.flush()
         self.signal_call_status(self.user_names(user), status)
         if status in ('FINISHED', 'CANCELLED'):
+            self.recorder.stop()
             self.state = None
             self.call = None
         elif status == 'RINGING' and not self.state and self.auto_answer:
@@ -110,6 +113,7 @@ class SkypeServer(object):
 
 
     def place_call(self, contact):
+        self.recorder.start(contact)
         self.sk.PlaceCall(contact)
         self.state = 'call placed'
 
