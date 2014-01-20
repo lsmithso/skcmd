@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 
 
 
@@ -268,7 +267,7 @@ class SkypeObject(dbus.service.Object):
         return self.skype.status()
 
 
-def main():
+def server_main():
     mainloop1 = dbus.mainloop.glib.DBusGMainLoop(set_as_default = True)
 
     session_bus = dbus.SessionBus()
@@ -319,9 +318,9 @@ class ClientVM(object):
             print '%d: %s/%s %s/%s %s' % (i, vm.PartnerDisplayName, vm.PartnerHandle, vm.Datetime,vm.Duration, vm.Status)
 
 
-if __name__ == '__main__':
+def main():
     if sys.argv[1] == 's':
-        main()
+        server_main()
         sys.exit(0)
     if sys.argv[1].startswith('vm'):
         vmc = ClientVM()

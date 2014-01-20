@@ -1,0 +1,7 @@
+#!/usr/bin/env python
+
+from  skcmdlib import skcmd
+
+if __name__ == '__main__':
+    skcmd.main()
+    
