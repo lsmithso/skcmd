@@ -29,6 +29,7 @@ class SkypeServer(object):
         self.call = None
         self.vm_id = None
         self.recorder = record.Record()
+        self.recording_enabled = True
 
         self.sk = sk.Skype(RunMainLoop = False)
         self.sk.Timeout = 60000
@@ -103,7 +104,8 @@ class SkypeServer(object):
         sys.stdout.flush()
         self.signal_call_status(self.user_names(user), status)
         if status in ('FINISHED', 'CANCELLED'):
-            self.recorder.stop()
+            if self.recording_enabled:
+                self.recorder.stop()
             self.state = None
             self.call = None
         elif status == 'RINGING' and not self.state and self.auto_answer:
@@ -112,7 +114,8 @@ class SkypeServer(object):
 
 
     def place_call(self, contact):
-        self.recorder.start(contact)
+        if self.recording_enabled:
+            self.recorder.start(contact)
         self.sk.PlaceCall(contact)
         self.state = 'call placed'
 
@@ -134,6 +137,8 @@ class SkypeServer(object):
 
     def answer(self):
         if self.call and not self.state and not self.auto_answer:
+            if self.recording_enabled:
+                self.recorder.start(self.call._GetPartnerHandle())
             self.call.Answer()
 
     def contacts(self):
@@ -185,6 +190,11 @@ class SkypeServer(object):
     def status(self):
         return 'Attached as %s - %s. Balance: %s' % (self.sk.CurrentUser.Handle, self.sk.CurrentUser.FullName, self.sk.CurrentUserProfile.BalanceToText)
 
+    def set_recording(self, on):
+        self.recording_enabled = True if on in ('1', 'y', 'Y') else False
+        return str(self.recording_enabled)
+
+
 
 
 class SkypeObject(dbus.service.Object):
@@ -215,6 +225,11 @@ class SkypeObject(dbus.service.Object):
     @dbus.service.method(I_NAME, in_signature = 's', out_signature = 's')
     def auto_answer(self, on):
         return self.skype .set_auto_answer(on)
+ 
+    @dbus.service.method(I_NAME, in_signature = 's', out_signature = 's')
+    def recording(self, on):
+        return self.skype .set_recording(on)
+       
 
     @dbus.service.method(I_NAME, in_signature = '', out_signature = '')
     def answer(self):
