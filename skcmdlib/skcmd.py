@@ -353,3 +353,6 @@ def main():
             rsp =  c.command(*sys.argv[1:])
             if rsp:
                 print rsp
+
+if __name__ == '__main__':
+    main()
