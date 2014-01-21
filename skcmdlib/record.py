@@ -64,10 +64,12 @@ class  Record(object):
     def make_filename(self):
         if not os.path.exists(self.RECORDING_DIR):
             os.mkdir(self.RECORDING_DIR)
-        
-        now = datetime.datetime.now()
-        filename = '%s_%s.ogg' % (self.filename_base.replace(' ', ''), now.strftime('%Y%m%d%H%M%S'))
-        return os.path.join(self.RECORDING_DIR, filename)
+        filename_base = self.filename_base.replace(' ', '')
+        for i in range(1000):
+            filename = os.path.join(self.RECORDING_DIR, '%s_%04d.ogg' % (filename_base, i))
+            if not os.path.exists(filename):
+                return filename
+        raise RuntimeError('You have way too many recordings for %s' % filename_base)
         
 
 if __name__ == '__main__':
