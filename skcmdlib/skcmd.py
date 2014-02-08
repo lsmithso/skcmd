@@ -103,14 +103,17 @@ class SkypeServer(object):
         print '%s-Call : %s %s' % (timestamp(), self.user_names(user), status)
         sys.stdout.flush()
         self.signal_call_status(self.user_names(user), status)
-        if status in ('FINISHED', 'CANCELLED'):
+        if status in ('FINISHED', 'CANCELLED', 'VM_SENT', 'MISSED'):
             if self.recording_enabled:
                 self.recorder.stop()
             self.state = None
             self.call = None
-        elif status == 'RINGING' and not self.state and self.auto_answer:
-            print 'answering'
-            call.Answer()
+        elif status == 'RINGING' and not self.state:
+            # Incoming call
+            self.signal_call_status('%s %s' % (user.Handle, user.FullName), 'calling')
+            if self.auto_answer:
+                print 'answering'
+                call.Answer()
 
 
     def place_call(self, contact):
