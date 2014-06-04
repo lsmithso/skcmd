@@ -71,6 +71,7 @@ class SkypeServer(object):
 
 
     def on_message(self, chat, status):
+        print 'xxxx', chat, status
         if status in ('RECEIVED','SENDING'):
             print timestamp(), status, chat.FromHandle, chat.Body
             sys.stdout.flush()
@@ -97,6 +98,7 @@ class SkypeServer(object):
 
 
     def on_call(self, call, status):
+#        print 'zzzz', call.OutputDevice()
         self.call = call
         partner_id = call._GetPartnerHandle()
         user = self.sk.User(partner_id)
