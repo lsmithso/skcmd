@@ -1,0 +1,2 @@
+Attempt to use gstreamer-1.0 to fix mic/spkr pulseaudio latency bug.
+skcmd works but makes no difference to latency.
