@@ -2,7 +2,6 @@
 
 
 import sys, datetime, os
-import gobject
 import dbus
 import dbus.service
 import dbus.mainloop.glib
@@ -10,6 +9,11 @@ import glib
 import logging
 import Skype4Py as sk
 import record
+
+import gi
+gi.require_version('Gst', '1.0')
+from gi.repository import GObject
+
 
 if os.getenv('SKCMD_DEBUG'):
     logging.basicConfig(level=logging.DEBUG)
@@ -298,7 +302,7 @@ def server_main():
     object.skype = s
     s.signal_call_status = object.signal_call_status
 
-    mainloop = gobject.MainLoop()
+    mainloop = GObject.MainLoop()
     mainloop.run()
 
 

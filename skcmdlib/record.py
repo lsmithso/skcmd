@@ -1,7 +1,10 @@
-import sys, os, subprocess, pygst, re, datetime
-import pygst
-pygst.require("0.10")
-import gst
+import sys, os, subprocess,  re, datetime
+import gi
+gi.require_version('Gst', '1.0')
+from gi.repository import GObject, Gst
+GObject.threads_init()
+Gst.init(None)
+
 
 class PulseAudioDefaults(object):
     def __init__(self):
@@ -49,17 +52,17 @@ class  Record(object):
         pipe_template = 'pulsesrc device=%s ! adder name=mix ! audioconvert ! vorbisenc ! oggmux  ! filesink location=%s pulsesrc device=%s ! queue ! mix.'
         pipeline = pipe_template % (pad.default_sink, self.make_filename(), pad.default_source)
         print 'pipeline', pipeline
-        self.pipeline =  gst.parse_launch(pipeline)
+        self.pipeline =  Gst.parse_launch(pipeline)
 
 
 
     def start(self, filename_base):
         self.filename_base = filename_base
         self.build_pipeline()
-        self.pipeline.set_state(gst.STATE_PLAYING)
+        self.pipeline.set_state(Gst.State.PLAYING)
 
     def stop(self):
-        self.pipeline.set_state(gst.STATE_NULL)
+        self.pipeline.set_state(Gst.State.NULL)
             
     def make_filename(self):
         if not os.path.exists(self.RECORDING_DIR):
